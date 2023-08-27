@@ -217,7 +217,41 @@ int logicalShift(int x, int n) {
  *   Rating: 4
  */
 int bitCount(int x) {
-  return 2;
+  /* Para entender o funcionamento do mecanismo, começo com um caso menor:
+    considere um inteiro de 1 byte a7a6a5a4a3a2a1a0.
+
+    Na primeira iteração, temos: (a7a6*a5a4*a3a2*a1a0*) + (xa7*a6a5*a4a3*a2a1*) =
+    = [0(a7+a6)0(a5+a4)0(a3+a2)0(a1+a0)], sendo os bits marcados com "*" os selecionados
+    pela máscara e x podendo ser 1 ou 0 por causa do shift right aritmético. Sabe-se que 
+    as somas das duplas de ai são no máximo 2 (10 em binário).
+
+    Na segunda iteração, temos: 
+    {[0(a7+a6)][0(a5+a4)]*[0(a3+a2)][0(a1+a0)]*} + {[00][0(a7+a6)]*[0(a5+a4)][0(a3+a2)]*} =
+    = [000(a7+a6+a5+a4)000(a3+a2+a1+a0)], sendo os pares de bits marcados com "*" os
+    selecionados pela máscara. Sabe-se que as somas dos quartetos de ai são no máximo
+    4 (100 em binário).
+    
+    Na terceira iteração, temos:
+    {[000(a7+a6+a5+a4)][000(a3+a2+a1+a0)]*} + {[0000][000(a7+a6+a5+a4)]*} =
+    = [0000000(a7+a6+a5+a4+a3+a2+a1+a0)], sendo os quartetos de bits marcados com "*" os
+    selecionados pela máscara. Sabe-se que a soma do octeto de ai são no máximo 8
+    (1000 em binário).
+
+    Por fim, a última máscara apenas seleciona o byte menos significativo, que contém a
+    soma de todos os ai e, portanto, a contagem de bits 1.
+
+    No caso, com inteiros de 32 bits, o mecanismo é o mesmo, porém com 5 iterações. */
+  int mask1 = 0x55 | (0x55 << 8) | (0x55 << 16) | (0x55 << 24); // 01010101...
+  int mask2 = 0x33 | (0x33 << 8) | (0x33 << 16) | (0x33 << 24); // 00110011...
+  int mask3 = 0x0F | (0x0F << 8) | (0x0F << 16) | (0x0F << 24); // 00001111...
+  int mask4 = 0xFF | (0xFF << 16); // 0000000011111111...
+  int mask5 = 0x1F; // ...0000000000011111 (soma de 16 bits ocupa no máximo 5 bits).
+  x = (x & mask1) + ((x >> 1) & mask1);
+  x = (x & mask2) + ((x >> 2) & mask2);
+  x = (x & mask3) + ((x >> 4) & mask3);
+  x = (x & mask4) + ((x >> 8) & mask4);
+  x = (x & mask5)  + ((x >> 16) & mask5);
+  return x;
 }
 /* 
  * bang - Compute !x without using !
