@@ -294,7 +294,12 @@ int tmin(void) {
  *   Rating: 2
  */
 int fitsBits(int x, int n) {
-  return 2;
+  /* Se x pode ser representado em n bits os 32-n bits mais significativos
+    serão iguais ao n-ésimo bit da direita para a esquerda. */
+  int _n = ~n + 1; // -n
+  int mask = (x << (32 + _n)) >> (32 + _n);
+  int resp = !(x ^ mask); // se x == mask: 1, x != mask: 0
+  return resp;
 }
 /* 
  * divpwr2 - Compute x/(2^n), for 0 <= n <= 30
