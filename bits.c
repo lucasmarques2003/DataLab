@@ -261,7 +261,15 @@ int bitCount(int x) {
  *   Rating: 4 
  */
 int bang(int x) {
-  return 2;
+  /* A ideia é que x | -x é 0 , se e somente se, x = 0 e, além disso,
+  x ou -x será um número negativo (ou ambos no caso 0x80000000), com o bit mais significativo
+  igual a 1.
+
+  Portanto, quando shiftado para a direita 31 vezes, se x = 0, o resultado é 0, se x != 0, 
+  o resultado é -1. Somando 1, temos a saída desejada.*/
+  int _x = ~x + 1; // -x
+  int resp = ((x | _x) >> 31) + 1; // x = 0: 1, x != 0: 0
+  return resp;
 }
 /* 
  * tmin - return minimum two's complement integer 
