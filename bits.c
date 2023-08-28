@@ -262,7 +262,8 @@ int bitCount(int x) {
  */
 int bang(int x) {
   /* A ideia é que x | -x é 0 , se e somente se, x = 0 e, além disso,
-  x ou -x será um número negativo (ou ambos no caso 0x80000000), com o bit mais significativo
+  x ou -x será um número negativo (ou ambos no caso 0x80000000), com o bit mais
+   significativo
   igual a 1.
 
   Portanto, quando shiftado para a direita 31 vezes, se x = 0, o resultado é 0, se x != 0, 
@@ -278,7 +279,10 @@ int bang(int x) {
  *   Rating: 1
  */
 int tmin(void) {
-  return 2;
+  /* O número mínimo de 32 bits é 0x80000000 (100000000000...), em
+    complemento de dois. O pensamento é análogo à representação de
+    3 bits, na qual 100 (-4) é o menor número. */
+  return 1 << 31;
 }
 /* 
  * fitsBits - return 1 if x can be represented as an 
