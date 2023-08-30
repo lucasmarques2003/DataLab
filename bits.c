@@ -352,7 +352,17 @@ int negate(int x)
  */
 int isPositive(int x)
 {
-  return 2;
+  /* A ideia é que se x > 0, o bit mais significativo será 0 e se x < 0,
+    o bit mais significativo será 1. No entanto deve ter uma verificação se x == 0,
+    pois também terá o bit mais significativo igual a 0, mas deve retornar 0.
+
+    Para isso, basta fazer uma verificação inicial se x é 0,  fazer x >> 31 para
+    preencher todos os bits com o sinal de x e fazer a operação !(shifted & 1) que
+    retorna o inverso do sinal de x (1 para x > 0 e 0 para x < 0). */
+  int if_0 = !!x;                   // x == 0: 0, x != 0: 1
+  int shifted = x >> 31;            // x >= 0: 0x0, x < 0: 0xffffffff
+  int resp = !(shifted & 1) & if_0; // x > 0: 1, x <= 0: 0
+  return resp;
 }
 /*
  * isLessOrEqual - if x <= y  then return 1, else return 0
