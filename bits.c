@@ -373,7 +373,22 @@ int isPositive(int x)
  */
 int isLessOrEqual(int x, int y)
 {
-  return 2;
+  /* A metodologia neste desafio foi verificar o sinal de x e y pelas variáveis 
+  if_x_neg e if_y_neg e o valor da diferença entre x e y na variável dif. No entanto,
+  o valor de dif não é confiável para variáveis com sinais diferentes por possível overflow.
+  Para x <= y, dif <= 0 (se os sinais de x e y são iguais). Para detectar o sinal de dif, foi usado
+  o mesmo algoritmo da função isPositive. Ao final, com a ajuda de um Mapa de Karnaugh com as
+  variáveis if_x_neg, if_y_neg e is_positive, foi formulada a expressão booleana da variável
+  resposta. */
+  int _y = ~y + 1;                         // -y
+  int if_x_neg = (x >> 31) & 1;            // x < 0: 1, x >= 0: 0
+  int if_y_neg = (y >> 31) & 1;            // y < 0: 1, y >= 0: 0
+  int dif = x + _y;                        // x - y
+  int if_0 = !!dif;                        // dif == 0: 0, dif != 0: 1
+  int shifted = dif >> 31;                 // dif >= 0: 0x0, dif < 0: 0xfffffffff
+  int is_positive = !(shifted & 1) & if_0; // dif > 0: 1, dif <= 0: 0
+  int resp = ((!is_positive) & ((!if_y_neg) | if_x_neg)) | (if_x_neg & (!if_y_neg));
+  return resp;
 }
 /*
  * ilog2 - return floor(log base 2 of x), where x > 0
