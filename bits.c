@@ -1,8 +1,8 @@
-/* 
- * CS:APP Data Lab 
- * 
+/*
+ * CS:APP Data Lab
+ *
  * <Please put your name and userid here>
- * 
+ *
  * bits.c - Source file with your solutions to the Lab.
  *          This is the file you will hand in to your instructor.
  *
@@ -10,7 +10,7 @@
  * compiler. You can still use printf for debugging without including
  * <stdio.h>, although you might get a compiler warning. In general,
  * it's not good practice to ignore compiler warnings, but in this
- * case it's OK.  
+ * case it's OK.
  */
 
 #if 0
@@ -129,7 +129,6 @@ NOTES:
  *      the correct answers.
  */
 
-
 #endif
 /* Copyright (C) 1991-2023 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -166,17 +165,18 @@ NOTES:
    - 56 emoji characters
    - 285 hentaigana
    - 3 additional Zanabazar Square characters */
-/* 
- * bitAnd - x&y using only ~ and | 
+/*
+ * bitAnd - x&y using only ~ and |
  *   Example: bitAnd(6, 5) = 4
  *   Legal ops: ~ |
  *   Max ops: 8
  *   Rating: 1
  */
-int bitAnd(int x, int y) {
-  return ~(~(x)|~(y));
+int bitAnd(int x, int y)
+{
+  return ~(~(x) | ~(y));
 }
-/* 
+/*
  * getByte - Extract byte n from word x
  *   Bytes numbered from 0 (LSB) to 3 (MSB)
  *   Examples: getByte(0x12345678,1) = 0x56
@@ -184,29 +184,31 @@ int bitAnd(int x, int y) {
  *   Max ops: 6
  *   Rating: 2
  */
-int getByte(int x, int n) {
+int getByte(int x, int n)
+{
   /* Shifta x até que o byte desejado esteja no começo e depois zera
    todos os outros bytes */
   x = x >> (n << 3);
   return x & 0xff;
 }
-/* 
+/*
  * logicalShift - shift x to the right by n, using a logical shift
  *   Can assume that 0 <= n <= 31
  *   Examples: logicalShift(0x87654321,4) = 0x08765432
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 20
- *   Rating: 3 
+ *   Rating: 3
  */
-int logicalShift(int x, int n) {
+int logicalShift(int x, int n)
+{
   /* Primeiro a função faz o right shift de x n vezes, então é criada
     uma máscara para zerar os bits à esquerda dos bits procurados,
     transformando um shift aritmético em um lógico.*/
-  int shifted = x >> n; // shift right aritmético.
-  int logical_not_n = !n; // se n=0, 1; caso contrário, 0.
-  int _1 = ~1 + 1; // 1 negativo.
+  int shifted = x >> n;                               // shift right aritmético.
+  int logical_not_n = !n;                             // se n=0, 1; caso contrário, 0.
+  int _1 = ~1 + 1;                                    // 1 negativo.
   int num = ((1 << 31) << logical_not_n) >> (n + _1); // máscara
-  int resp = shifted & (~num); // apaga os bits criados à esquerda
+  int resp = shifted & (~num);                        // apaga os bits criados à esquerda
   return resp;
 }
 /*
@@ -216,21 +218,22 @@ int logicalShift(int x, int n) {
  *   Max ops: 40
  *   Rating: 4
  */
-int bitCount(int x) {
+int bitCount(int x)
+{
   /* Para entender o funcionamento do mecanismo, começo com um caso menor:
     considere um inteiro de 1 byte a7a6a5a4a3a2a1a0.
 
     Na primeira iteração, temos: (a7a6*a5a4*a3a2*a1a0*) + (xa7*a6a5*a4a3*a2a1*) =
     = [0(a7+a6)0(a5+a4)0(a3+a2)0(a1+a0)], sendo os bits marcados com "*" os selecionados
-    pela máscara e x podendo ser 1 ou 0 por causa do shift right aritmético. Sabe-se que 
+    pela máscara e x podendo ser 1 ou 0 por causa do shift right aritmético. Sabe-se que
     as somas das duplas de ai são no máximo 2 (10 em binário).
 
-    Na segunda iteração, temos: 
+    Na segunda iteração, temos:
     {[0(a7+a6)][0(a5+a4)]*[0(a3+a2)][0(a1+a0)]*} + {[00][0(a7+a6)]*[0(a5+a4)][0(a3+a2)]*} =
     = [000(a7+a6+a5+a4)000(a3+a2+a1+a0)], sendo os pares de bits marcados com "*" os
     selecionados pela máscara. Sabe-se que as somas dos quartetos de ai são no máximo
     4 (100 em binário).
-    
+
     Na terceira iteração, temos:
     {[000(a7+a6+a5+a4)][000(a3+a2+a1+a0)]*} + {[0000][000(a7+a6+a5+a4)]*} =
     = [0000000(a7+a6+a5+a4+a3+a2+a1+a0)], sendo os quartetos de bits marcados com "*" os
@@ -244,48 +247,50 @@ int bitCount(int x) {
   int mask1 = 0x55 | (0x55 << 8) | (0x55 << 16) | (0x55 << 24); // 01010101...
   int mask2 = 0x33 | (0x33 << 8) | (0x33 << 16) | (0x33 << 24); // 00110011...
   int mask3 = 0x0F | (0x0F << 8) | (0x0F << 16) | (0x0F << 24); // 00001111...
-  int mask4 = 0xFF | (0xFF << 16); // 0000000011111111...
-  int mask5 = 0x1F; // ...0000000000011111 (soma de 16 bits ocupa no máximo 5 bits).
+  int mask4 = 0xFF | (0xFF << 16);                              // 0000000011111111...
+  int mask5 = 0x1F;                                             // ...0000000000011111 (soma de 16 bits ocupa no máximo 5 bits).
   x = (x & mask1) + ((x >> 1) & mask1);
   x = (x & mask2) + ((x >> 2) & mask2);
   x = (x & mask3) + ((x >> 4) & mask3);
   x = (x & mask4) + ((x >> 8) & mask4);
-  x = (x & mask5)  + ((x >> 16) & mask5);
+  x = (x & mask5) + ((x >> 16) & mask5);
   return x;
 }
-/* 
+/*
  * bang - Compute !x without using !
  *   Examples: bang(3) = 0, bang(0) = 1
  *   Legal ops: ~ & ^ | + << >>
  *   Max ops: 12
- *   Rating: 4 
+ *   Rating: 4
  */
-int bang(int x) {
+int bang(int x)
+{
   /* A ideia é que x | -x é 0 , se e somente se, x = 0 e, além disso,
   x ou -x será um número negativo (ou ambos no caso 0x80000000), com o bit mais
    significativo
   igual a 1.
 
-  Portanto, quando shiftado para a direita 31 vezes, se x = 0, o resultado é 0, se x != 0, 
+  Portanto, quando shiftado para a direita 31 vezes, se x = 0, o resultado é 0, se x != 0,
   o resultado é -1. Somando 1, temos a saída desejada.*/
-  int _x = ~x + 1; // -x
+  int _x = ~x + 1;                 // -x
   int resp = ((x | _x) >> 31) + 1; // x = 0: 1, x != 0: 0
   return resp;
 }
-/* 
- * tmin - return minimum two's complement integer 
+/*
+ * tmin - return minimum two's complement integer
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 4
  *   Rating: 1
  */
-int tmin(void) {
+int tmin(void)
+{
   /* O número mínimo de 32 bits é 0x80000000 (100000000000...), em
     complemento de dois. O pensamento é análogo à representação de
     3 bits, na qual 100 (-4) é o menor número. */
   return 1 << 31;
 }
-/* 
- * fitsBits - return 1 if x can be represented as an 
+/*
+ * fitsBits - return 1 if x can be represented as an
  *  n-bit, two's complement integer.
  *   1 <= n <= 32
  *   Examples: fitsBits(5,3) = 0, fitsBits(-4,3) = 1
@@ -293,7 +298,8 @@ int tmin(void) {
  *   Max ops: 15
  *   Rating: 2
  */
-int fitsBits(int x, int n) {
+int fitsBits(int x, int n)
+{
   /* Se x pode ser representado em n bits os 32-n bits mais significativos
     serão iguais ao n-ésimo bit da direita para a esquerda. */
   int _n = ~n + 1; // -n
@@ -301,7 +307,7 @@ int fitsBits(int x, int n) {
   int resp = !(x ^ mask); // se x == mask: 1, x != mask: 0
   return resp;
 }
-/* 
+/*
  * divpwr2 - Compute x/(2^n), for 0 <= n <= 30
  *  Round toward zero
  *   Examples: divpwr2(15,1) = 7, divpwr2(-33,4) = -2
@@ -309,39 +315,54 @@ int fitsBits(int x, int n) {
  *   Max ops: 15
  *   Rating: 2
  */
-int divpwr2(int x, int n) {
-    return 2;
+int divpwr2(int x, int n)
+{
+  /* A ideia é que se x for positivo, o resultado é apenas x >> n, porém
+  se x for negativo tem-se um problema, pois a operação de shift para a direita
+  arrendonda sempre para o menor inteiro e não para o mais próximo de 0.
+
+  Para resolver o problema, é criada uma máscara que resulta em 0 para números positivos
+  e (2^n)-1 para números negativos, essa máscara então é somada a x e por fim é feita a
+  operação. Alguns exemplos para ficar claro: divpwr(-15, 2) = -3, pois (-15+3)/4 = -3;
+  divpwr(-16, 3) = -2, pois (-16+7)/8 = -1,125, que arredondado para baixo é -2.*/
+  int _1 = ~0;                            // -1
+  int mask = (x >> 31) & ((1 << n) + _1); // 0 se x >= 0, (2^n)-1 se x < 0.
+  int resp = (x + mask) >> n;             // x >> n se x >= 0, (x + 2^n) >> n se x < 0.
+  return resp;
 }
-/* 
- * negate - return -x 
+/*
+ * negate - return -x
  *   Example: negate(1) = -1.
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 5
  *   Rating: 2
  */
-int negate(int x) {
+int negate(int x)
+{
   /* Essa lógica já foi usada em vários desafios anteriores:
     -x = ~x +1, pela representação de complemento de 2. */
   return ~x + 1;
 }
-/* 
- * isPositive - return 1 if x > 0, return 0 otherwise 
+/*
+ * isPositive - return 1 if x > 0, return 0 otherwise
  *   Example: isPositive(-1) = 0.
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 8
  *   Rating: 3
  */
-int isPositive(int x) {
+int isPositive(int x)
+{
   return 2;
 }
-/* 
- * isLessOrEqual - if x <= y  then return 1, else return 0 
+/*
+ * isLessOrEqual - if x <= y  then return 1, else return 0
  *   Example: isLessOrEqual(4,5) = 1.
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 24
  *   Rating: 3
  */
-int isLessOrEqual(int x, int y) {
+int isLessOrEqual(int x, int y)
+{
   return 2;
 }
 /*
@@ -351,10 +372,11 @@ int isLessOrEqual(int x, int y) {
  *   Max ops: 90
  *   Rating: 4
  */
-int ilog2(int x) {
+int ilog2(int x)
+{
   return 2;
 }
-/* 
+/*
  * float_neg - Return bit-level equivalent of expression -f for
  *   floating point argument f.
  *   Both the argument and result are passed as unsigned int's, but
@@ -365,10 +387,11 @@ int ilog2(int x) {
  *   Max ops: 10
  *   Rating: 2
  */
-unsigned float_neg(unsigned uf) {
- return 2;
+unsigned float_neg(unsigned uf)
+{
+  return 2;
 }
-/* 
+/*
  * float_i2f - Return bit-level equivalent of expression (float) x
  *   Result is returned as unsigned int, but
  *   it is to be interpreted as the bit-level representation of a
@@ -377,10 +400,11 @@ unsigned float_neg(unsigned uf) {
  *   Max ops: 30
  *   Rating: 4
  */
-unsigned float_i2f(int x) {
+unsigned float_i2f(int x)
+{
   return 2;
 }
-/* 
+/*
  * float_twice - Return bit-level equivalent of expression 2*f for
  *   floating point argument f.
  *   Both the argument and result are passed as unsigned int's, but
@@ -391,6 +415,7 @@ unsigned float_i2f(int x) {
  *   Max ops: 30
  *   Rating: 4
  */
-unsigned float_twice(unsigned uf) {
+unsigned float_twice(unsigned uf)
+{
   return 2;
 }
