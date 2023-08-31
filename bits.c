@@ -359,9 +359,9 @@ int isPositive(int x)
     Para isso, basta fazer uma verificação inicial se x é 0,  fazer x >> 31 para
     preencher todos os bits com o sinal de x e fazer a operação !(shifted & 1) que
     retorna o inverso do sinal de x (1 para x > 0 e 0 para x < 0). */
-  int if_0 = !!x;                   // x == 0: 0, x != 0: 1
-  int shifted = x >> 31;            // x >= 0: 0x0, x < 0: 0xffffffff
-  int resp = !(shifted & 1) & if_0; // x > 0: 1, x <= 0: 0
+  int if_0 = !!x;                     // x == 0: 0, x != 0: 1
+  int shifted = x >> 31;              // x >= 0: 0x0, x < 0: 0xffffffff
+  int resp = (!(shifted & 1)) & if_0; // x > 0: 1, x <= 0: 0
   return resp;
 }
 /*
@@ -380,13 +380,13 @@ int isLessOrEqual(int x, int y)
   o mesmo algoritmo da função isPositive. Ao final, com a ajuda de um Mapa de Karnaugh com as
   variáveis if_x_neg, if_y_neg e is_positive, foi formulada a expressão booleana da variável
   resposta. */
-  int _y = ~y + 1;                         // -y
-  int if_x_neg = (x >> 31) & 1;            // x < 0: 1, x >= 0: 0
-  int if_y_neg = (y >> 31) & 1;            // y < 0: 1, y >= 0: 0
-  int dif = x + _y;                        // x - y
-  int if_0 = !!dif;                        // dif == 0: 0, dif != 0: 1
-  int shifted = dif >> 31;                 // dif >= 0: 0x0, dif < 0: 0xfffffffff
-  int is_positive = !(shifted & 1) & if_0; // dif > 0: 1, dif <= 0: 0
+  int _y = ~y + 1;                           // -y
+  int if_x_neg = (x >> 31) & 1;              // x < 0: 1, x >= 0: 0
+  int if_y_neg = (y >> 31) & 1;              // y < 0: 1, y >= 0: 0
+  int dif = x + _y;                          // x - y
+  int if_0 = !!dif;                          // dif == 0: 0, dif != 0: 1
+  int shifted = dif >> 31;                   // dif >= 0: 0x0, dif < 0: 0xfffffffff
+  int is_positive = (!(shifted & 1)) & if_0; // dif > 0: 1, dif <= 0: 0
   int resp = ((!is_positive) & ((!if_y_neg) | if_x_neg)) | (if_x_neg & (!if_y_neg));
   return resp;
 }
@@ -400,7 +400,7 @@ int isLessOrEqual(int x, int y)
 int ilog2(int x)
 {
   /* A ideia é fazer uma busca binária pelo bit setado mais significativo, cuja posição será a resposta
-  esperada. As somas na variável resposta servem para o resultado ficar correto após o shift de x, pois 
+  esperada. As somas na variável resposta servem para o resultado ficar correto após o shift de x, pois
   a posição final deve considerar essa operação. */
   int resp = 0; // seta a variável resp
 
@@ -438,7 +438,19 @@ int ilog2(int x)
  */
 unsigned float_neg(unsigned uf)
 {
-  return 2;
+  /* Para fazer a operação -f, basicamente deve-se inverter o bit mais significativo,
+  que guarda a informação do sinal. No entanto, a priori, deve-se detectar NaN: definido
+  na representação de single precision como todos os bits do expoente iguais a 1 e a 
+  mantissa diferente de 0 */
+  int mask_exp = 0x7f800000; // 0111111110000000...
+  int mask_mant = 0x7fffff;  // 0000000001111111...
+  if ((!((uf & mask_exp) ^ mask_exp)) && (!!(uf & mask_mant))) // if(NaN)
+    return uf;
+  else
+  {
+    unsigned int resp = uf ^ 0x80000000;
+    return resp;
+  }
 }
 /*
  * float_i2f - Return bit-level equivalent of expression (float) x
