@@ -373,7 +373,7 @@ int isPositive(int x)
  */
 int isLessOrEqual(int x, int y)
 {
-  /* A metodologia neste desafio foi verificar o sinal de x e y pelas variáveis 
+  /* A metodologia neste desafio foi verificar o sinal de x e y pelas variáveis
   if_x_neg e if_y_neg e o valor da diferença entre x e y na variável dif. No entanto,
   o valor de dif não é confiável para variáveis com sinais diferentes por possível overflow.
   Para x <= y, dif <= 0 (se os sinais de x e y são iguais). Para detectar o sinal de dif, foi usado
@@ -399,7 +399,31 @@ int isLessOrEqual(int x, int y)
  */
 int ilog2(int x)
 {
-  return 2;
+  /* A ideia é fazer uma busca binária pelo bit setado mais significativo, cuja posição será a resposta
+  esperada. As somas na variável resposta servem para o resultado ficar correto após o shift de x, pois 
+  a posição final deve considerar essa operação. */
+  int resp = 0; // seta a variável resp
+
+  int found = ((!!(x >> 16)) << 31) >> 31; // 0xffffffff se há bit setado nos 2 primeiros bytes, 0 se não
+  resp = resp + (found & 16);              // Aqui a resposta será somada de 16 caso o bit procurado esteja nos
+  x = x >> (found & 16);                   // 2 primeiros bytes e x shiftado 16x, caso contrário nada acontece
+
+  found = ((!!(x >> 8)) << 31) >> 31; // 0xffffffff se há bit setado nos 24 primeiros bits, 0 se não
+  resp = resp + (found & 8);          // Aqui a resposta será somada de 8 caso o bit procurado esteja nos
+  x = x >> (found & 8);               // 24 primeiros bits e x shiftado 8x, caso contrário nada acontece
+
+  found = ((!!(x >> 4)) << 31) >> 31; // 0xffffffff se há bit setado nos 28 primeiros bits, 0 se não
+  resp = resp + (found & 4);          // Aqui a resposta será somada de 4 caso o bit procurado esteja nos
+  x = x >> (found & 4);               // 28 primeiros bits e x shiftado 4x, caso contrário nada acontece
+
+  found = ((!!(x >> 2)) << 31) >> 31; // 0xffffffff se há bit setado nos 30 primeiros bits, 0 se não
+  resp = resp + (found & 2);          // Aqui a resposta será somada de 2 caso o bit procurado esteja nos
+  x = x >> (found & 2);               // 30 primeiros bits e x shiftado 2x, caso contrário nada acontece
+
+  found = ((!!(x >> 1)) << 31) >> 31; // 0xffffffff se há bit setado nos 31 primeiros bits, 0 se não
+  resp = resp + (found & 1);          // Aqui a resposta será somada de 1 caso o bit procurado esteja nos
+                                      // 31 primeiros bits, caso contrário nada acontece
+  return resp;
 }
 /*
  * float_neg - Return bit-level equivalent of expression -f for
