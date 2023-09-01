@@ -204,11 +204,12 @@ int logicalShift(int x, int n)
   /* Primeiro a função faz o right shift de x n vezes, então é criada
     uma máscara para zerar os bits à esquerda dos bits procurados,
     transformando um shift aritmético em um lógico.*/
-  int shifted = x >> n;                               // shift right aritmético.
-  int logical_not_n = !n;                             // se n=0, 1; caso contrário, 0.
-  int _1 = ~1 + 1;                                    // 1 negativo.
-  int num = ((1 << 31) << logical_not_n) >> (n + _1); // máscara
-  int resp = shifted & (~num);                        // apaga os bits criados à esquerda
+  int shifted, logical_not_n, _1, num, resp;
+  shifted = x >> n;                               // shift right aritmético.
+  logical_not_n = !n;                             // se n=0, 1; caso contrário, 0.
+  _1 = ~1 + 1;                                    // 1 negativo.
+  num = ((1 << 31) << logical_not_n) >> (n + _1); // máscara
+  resp = shifted & (~num);                        // apaga os bits criados à esquerda
   return resp;
 }
 /*
@@ -272,8 +273,9 @@ int bang(int x)
 
   Portanto, quando shiftado para a direita 31 vezes, se x = 0, o resultado é 0, se x != 0,
   o resultado é -1. Somando 1, temos a saída desejada.*/
-  int _x = ~x + 1;                 // -x
-  int resp = ((x | _x) >> 31) + 1; // x = 0: 1, x != 0: 0
+  int _x, resp;
+  _x = ~x + 1;                 // -x
+  resp = ((x | _x) >> 31) + 1; // x = 0: 1, x != 0: 0
   return resp;
 }
 /*
@@ -302,9 +304,10 @@ int fitsBits(int x, int n)
 {
   /* Se x pode ser representado em n bits os 32-n bits mais significativos
     serão iguais ao n-ésimo bit da direita para a esquerda. */
-  int _n = ~n + 1; // -n
-  int mask = (x << (32 + _n)) >> (32 + _n);
-  int resp = !(x ^ mask); // se x == mask: 1, x != mask: 0
+  int _n, mask, resp;
+  _n = ~n + 1; // -n
+  mask = (x << (32 + _n)) >> (32 + _n);
+  resp = !(x ^ mask); // se x == mask: 1, x != mask: 0
   return resp;
 }
 /*
@@ -325,9 +328,10 @@ int divpwr2(int x, int n)
   e (2^n)-1 para números negativos, essa máscara então é somada a x e por fim é feita a
   operação. Alguns exemplos para ficar claro: divpwr(-15, 2) = -3, pois (-15+3)/4 = -3;
   divpwr(-16, 3) = -2, pois (-16+7)/8 = -1,125, que arredondado para baixo é -2.*/
-  int _1 = ~0;                            // -1
-  int mask = (x >> 31) & ((1 << n) + _1); // 0 se x >= 0, (2^n)-1 se x < 0.
-  int resp = (x + mask) >> n;             // x >> n se x >= 0, (x + 2^n) >> n se x < 0.
+  int _1, mask, resp;
+  _1 = ~0;                            // -1
+  mask = (x >> 31) & ((1 << n) + _1); // 0 se x >= 0, (2^n)-1 se x < 0.
+  resp = (x + mask) >> n;             // x >> n se x >= 0, (x + 2^n) >> n se x < 0.
   return resp;
 }
 /*
@@ -359,9 +363,10 @@ int isPositive(int x)
     Para isso, basta fazer uma verificação inicial se x é 0,  fazer x >> 31 para
     preencher todos os bits com o sinal de x e fazer a operação !(shifted & 1) que
     retorna o inverso do sinal de x (1 para x > 0 e 0 para x < 0). */
-  int if_0 = !!x;                     // x == 0: 0, x != 0: 1
-  int shifted = x >> 31;              // x >= 0: 0x0, x < 0: 0xffffffff
-  int resp = (!(shifted & 1)) & if_0; // x > 0: 1, x <= 0: 0
+  int if_0, shifted, resp;
+  if_0 = !!x;                     // x == 0: 0, x != 0: 1
+  shifted = x >> 31;              // x >= 0: 0x0, x < 0: 0xffffffff
+  resp = (!(shifted & 1)) & if_0; // x > 0: 1, x <= 0: 0
   return resp;
 }
 /*
@@ -380,14 +385,15 @@ int isLessOrEqual(int x, int y)
   o mesmo algoritmo da função isPositive. Ao final, com a ajuda de um Mapa de Karnaugh com as
   variáveis if_x_neg, if_y_neg e is_positive, foi formulada a expressão booleana da variável
   resposta. */
-  int _y = ~y + 1;                           // -y
-  int if_x_neg = (x >> 31) & 1;              // x < 0: 1, x >= 0: 0
-  int if_y_neg = (y >> 31) & 1;              // y < 0: 1, y >= 0: 0
-  int dif = x + _y;                          // x - y
-  int if_0 = !!dif;                          // dif == 0: 0, dif != 0: 1
-  int shifted = dif >> 31;                   // dif >= 0: 0x0, dif < 0: 0xfffffffff
-  int is_positive = (!(shifted & 1)) & if_0; // dif > 0: 1, dif <= 0: 0
-  int resp = ((!is_positive) & ((!if_y_neg) | if_x_neg)) | (if_x_neg & (!if_y_neg));
+  int _y, if_x_neg, if_y_neg, dif, if_0, shifted, is_positive, resp;
+  _y = ~y + 1;                           // -y
+  if_x_neg = (x >> 31) & 1;              // x < 0: 1, x >= 0: 0
+  if_y_neg = (y >> 31) & 1;              // y < 0: 1, y >= 0: 0
+  dif = x + _y;                          // x - y
+  if_0 = !!dif;                          // dif == 0: 0, dif != 0: 1
+  shifted = dif >> 31;                   // dif >= 0: 0x0, dif < 0: 0xfffffffff
+  is_positive = (!(shifted & 1)) & if_0; // dif > 0: 1, dif <= 0: 0
+  resp = ((!is_positive) & ((!if_y_neg) | if_x_neg)) | (if_x_neg & (!if_y_neg));
   return resp;
 }
 /*
@@ -402,11 +408,12 @@ int ilog2(int x)
   /* A ideia é fazer uma busca binária pelo bit setado mais significativo, cuja posição será a resposta
   esperada. As somas na variável resposta servem para o resultado ficar correto após o shift de x, pois
   a posição final deve considerar essa operação. */
-  int resp = 0; // seta a variável resp
+  int resp, found;
+  resp = 0; // seta a variável resp
 
-  int found = ((!!(x >> 16)) << 31) >> 31; // 0xffffffff se há bit setado nos 2 primeiros bytes, 0 se não
-  resp = resp + (found & 16);              // Aqui a resposta será somada de 16 caso o bit procurado esteja nos
-  x = x >> (found & 16);                   // 2 primeiros bytes e x shiftado 16x, caso contrário nada acontece
+  found = ((!!(x >> 16)) << 31) >> 31; // 0xffffffff se há bit setado nos 2 primeiros bytes, 0 se não
+  resp = resp + (found & 16);          // Aqui a resposta será somada de 16 caso o bit procurado esteja nos
+  x = x >> (found & 16);               // 2 primeiros bytes e x shiftado 16x, caso contrário nada acontece
 
   found = ((!!(x >> 8)) << 31) >> 31; // 0xffffffff se há bit setado nos 24 primeiros bits, 0 se não
   resp = resp + (found & 8);          // Aqui a resposta será somada de 8 caso o bit procurado esteja nos
@@ -440,15 +447,17 @@ unsigned float_neg(unsigned uf)
 {
   /* Para fazer a operação -f, basicamente deve-se inverter o bit mais significativo,
   que guarda a informação do sinal. No entanto, a priori, deve-se detectar NaN: definido
-  na representação de single precision como todos os bits do expoente iguais a 1 e a 
+  na representação de single precision como todos os bits do expoente iguais a 1 e a
   mantissa diferente de 0 */
-  int mask_exp = 0x7f800000; // 0111111110000000...
-  int mask_mant = 0x7fffff;  // 0000000001111111...
+  int mask_exp, mask_mant;
+  unsigned int resp;
+  mask_exp = 0x7f800000;                                       // 0111111110000000...
+  mask_mant = 0x7fffff;                                        // 0000000001111111...
   if ((!((uf & mask_exp) ^ mask_exp)) && (!!(uf & mask_mant))) // if(NaN)
     return uf;
   else
   {
-    unsigned int resp = uf ^ 0x80000000;
+    resp = uf ^ 0x80000000;
     return resp;
   }
 }
@@ -463,7 +472,42 @@ unsigned float_neg(unsigned uf)
  */
 unsigned float_i2f(int x)
 {
-  return 2;
+  unsigned int resp;
+  int s, e, m, round;
+  if ((!x)) // if(x == 0)
+    return x;
+  else
+  {
+    s = x < 0; // captura o sinal do número
+    e = 158;   // 127 + 31
+    m = 0;
+    if (s && (x != 0x80000000))   // if(x < 0)
+      x = -x;                     // a mantissa não é representada em C2
+    while ((x & 0x80000000) == 0) // while(bit mais significativo = 0)
+    {
+      /* No fim do laço, x estará com o bit mais significativo igual a 1
+        e os bits restantes serão separados em 2 grupos: 8-30 (23 bits para
+        a mantissa) e 0-7 (bits que "sobraram para a direita", que serão
+        importantes para arrendondar a mantissa no final)*/
+      x = x << 1;
+      e--; // o expoente será basicamente a posição do bit mais significativo setado
+    }
+    // printf("%d %d %d %d\n", x, e, m, s);
+    round = x & 0xff;                               // pega os bits 0-7
+    m = x >> 8;                                     // shifta os bits 8-30 para os 23 bits menos significativos
+    m = m & 0x7fffff;                               // pega os bits 8-30
+    if ((round > 128) || (round == 128 && (m & 1))) // arredonda para cima
+    {
+      m++;
+      if (m > 0x7fffff) // renormalizar
+      {
+        m = (m & 0x7fffff) >> 1;
+        e++;
+      }
+    }
+    resp = (s << 31) | (e << 23) | m; // monta a representação final
+    return resp;
+  }
 }
 /*
  * float_twice - Return bit-level equivalent of expression 2*f for
@@ -478,5 +522,18 @@ unsigned float_i2f(int x)
  */
 unsigned float_twice(unsigned uf)
 {
-  return 2;
+  unsigned int mask_exp, mask_mant, sig, exp, mant, resp;
+  mask_exp = 0x7f800000;                                              // 0111111110000000...
+  mask_mant = 0x7fffff;                                               // 0000000001111111...
+  if ((!uf) | (!(uf ^ 0x80000000)) | (!((uf & mask_exp) ^ mask_exp))) // if(uf == 0 | NaN | Inf)
+    return uf;
+  sig = (uf & 0x80000000);         // separa o bit de sinal
+  exp = (uf & mask_exp);           // separa os bits do expoente
+  mant = (uf & mask_mant);         // separa os bits da mantissa
+  if (!exp)                        // if(exp == 0)
+    mant = mant << 1;              // apenas multiplica a mantissa por 2 normalmente
+  else                             // if(exp != 0)
+    exp = ((exp >> 23) + 1) << 23; // incrementa o expoente
+  resp = sig | exp | mant;         // forma o número de novo, da forma esperada
+  return resp;
 }
